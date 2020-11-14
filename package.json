@@ -10,8 +10,7 @@
     "mongodb": "^3.5.9",
     "next": "latest",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-google-login": "^5.1.22"
+    "react-dom": "^16.13.1"
   },
   "license": "MIT",
   "devDependencies": {

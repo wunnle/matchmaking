@@ -1,79 +1,9 @@
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
-import GoogleLogin from 'react-google-login'
+import useGoogleLogin from '../hooks/useGoogleLogin'
 import { connectToDatabase } from '../util/mongodb'
 
 export default function Home({ isConnected }) {
-  const [name, setName] = useState('')
-  const [signInStatus, setSignInStatus] = useState('loading')
-
-  const responseGoogle = googleUser => {
-    var profile = googleUser.getBasicProfile()
-    var id_token = googleUser.getAuthResponse().id_token
-    console.log('ID token', id_token)
-    console.log('ID: ' + profile.getId()) // Do not send to your backend! Use an ID token instead.
-    console.log('Name: ' + profile.getName())
-    console.log('Image URL: ' + profile.getImageUrl())
-    console.log('Email: ' + profile.getEmail()) // This is null if the 'email' scope is not present.
-    setName(profile.getName())
-  }
-
-  async function signIn() {
-    var auth2 = window.gapi.auth2.getAuthInstance()
-    const googleUser = await auth2.signIn({
-      scope: 'profile email'
-    })
-    responseGoogle(googleUser)
-  }
-
-  function signOut() {
-    console.log('hey')
-    var auth2 = window.gapi.auth2.getAuthInstance()
-    auth2.signOut().then(function () {
-      console.log('User signed out.')
-    })
-  }
-
-  useEffect(() => {
-    const googleInterval = setInterval(() => {
-      if (window.gapi) {
-        console.log('LOADED')
-        initGoogle()
-        clearInterval(googleInterval)
-      } else {
-        console.log('hold on..')
-      }
-    }, 300)
-
-    return () => clearInterval(googleInterval)
-  }, [])
-
-  function initGoogle() {
-    console.log('initing!')
-
-    function handleGoogleInit(auth) {
-      console.log(auth)
-
-      const isSignedIn = auth.isSignedIn.get()
-      setSignInStatus(isSignedIn ? 'signedIn' : 'notSignedIn')
-    }
-
-    window.gapi.load('auth2', function () {
-      console.log('load..')
-
-      /* Ready. Make a call to gapi.auth2.init or some other API */
-
-      if (window.gapi && process.env.NEXT_PUBLIC_GOOGLE_ID) {
-        const auth = window.gapi.auth2.init({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_ID
-        })
-
-        auth.then(handleGoogleInit)
-
-        console.log({ auth })
-      }
-    })
-  }
+  const { signInStatus, signIn, signOut } = useGoogleLogin()
 
   return (
     <div className="container">
@@ -83,14 +13,9 @@ export default function Home({ isConnected }) {
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
-        <script
-          src="https://apis.google.com/js/platform.js?onload=init"
-          async
-          defer
-        ></script>
       </Head>
       <main>
-        <h1 className="title">Matchmaking {name}</h1>
+        <h1 className="title">Matchmaking</h1>
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
         ) : (
