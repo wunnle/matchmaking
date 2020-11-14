@@ -35,30 +35,45 @@ export default function Home({ isConnected }) {
   }
 
   useEffect(() => {
-    window.init = () => {
-      console.log('initing!')
-      function handleGoogleInit(auth) {
-        console.log(auth)
-
-        const isSignedIn = auth.isSignedIn.get()
-        setSignInStatus(isSignedIn ? 'signedIn' : 'notSignedIn')
+    const googleInterval = setInterval(() => {
+      if (window.gapi) {
+        console.log('LOADED')
+        initGoogle()
+        clearInterval(googleInterval)
+      } else {
+        console.log('hold on..')
       }
+    }, 300)
 
-      window.gapi.load('auth2', function () {
-        /* Ready. Make a call to gapi.auth2.init or some other API */
-
-        if (window.gapi && process.env.NEXT_PUBLIC_GOOGLE_ID) {
-          const auth = window.gapi.auth2.init({
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_ID
-          })
-
-          auth.then(handleGoogleInit)
-
-          console.log({ auth })
-        }
-      })
-    }
+    return () => clearInterval(googleInterval)
   }, [])
+
+  function initGoogle() {
+    console.log('initing!')
+
+    function handleGoogleInit(auth) {
+      console.log(auth)
+
+      const isSignedIn = auth.isSignedIn.get()
+      setSignInStatus(isSignedIn ? 'signedIn' : 'notSignedIn')
+    }
+
+    window.gapi.load('auth2', function () {
+      console.log('load..')
+
+      /* Ready. Make a call to gapi.auth2.init or some other API */
+
+      if (window.gapi && process.env.NEXT_PUBLIC_GOOGLE_ID) {
+        const auth = window.gapi.auth2.init({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_ID
+        })
+
+        auth.then(handleGoogleInit)
+
+        console.log({ auth })
+      }
+    })
+  }
 
   return (
     <div className="container">
