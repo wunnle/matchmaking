@@ -1,13 +1,13 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import useGoogleLogin from '../hooks/useGoogleLogin'
 import { connectToDatabase } from '../util/mongodb'
 
 export default function Home({ isConnected }) {
-  const { signInStatus, signIn, signOut } = useGoogleLogin()
+  const { signInStatus, signOut } = useGoogleLogin()
 
   return (
     <div className="container">
-      <button onClick={signIn}>Sign in</button>
       <button onClick={signOut}>Sign out</button>
       <div>{signInStatus}</div>
       <Head>
@@ -30,15 +30,18 @@ export default function Home({ isConnected }) {
         </p>
 
         <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Create a game</h3>
-            <p>Lorem ipsum dolor sit amet.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Find a game</h3>
-            <p>Lorem ipsum dolor sit amet.</p>
-          </a>
+          <Link href="/create">
+            <a className="card">
+              <h3>Create a game</h3>
+              <p>Lorem ipsum dolor sit amet.</p>
+            </a>
+          </Link>
+          <Link href="/find">
+            <a className="card">
+              <h3>Find a game</h3>
+              <p>Lorem ipsum dolor sit amet.</p>
+            </a>
+          </Link>
         </div>
       </main>
       <footer>
@@ -182,19 +185,6 @@ export default function Home({ isConnected }) {
             width: 100%;
             flex-direction: column;
           }
-        }
-      `}</style>
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-            Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
         }
       `}</style>
     </div>

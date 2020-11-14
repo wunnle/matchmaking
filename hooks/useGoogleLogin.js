@@ -1,5 +1,12 @@
 const { useEffect, useState } = require('react')
 
+export const googleSignInStatuses = {
+  loading: 'loading',
+  signedIn: 'signedIn',
+  notSignedIn: 'notSignedIn',
+  signedOut: 'signedOut'
+}
+
 function useGoogleLogin() {
   const [user, setUser] = useState({})
   const [signInStatus, setSignInStatus] = useState('loading')
@@ -60,6 +67,7 @@ function useGoogleLogin() {
     const googleUser = await auth2.signIn({
       scope: 'profile email'
     })
+    setSignInStatus(googleSignInStatuses.signedIn)
     setUserDetails(googleUser)
   }
 
