@@ -1,28 +1,87 @@
 import Head from 'next/head'
-import LoginWithGoogleButton from '../components/LoginWithGoogleButton'
+import { useEffect, useState } from 'react'
+import GoogleLogin from 'react-google-login'
 import { connectToDatabase } from '../util/mongodb'
 
 export default function Home({ isConnected }) {
+  const [name, setName] = useState('')
+  const [signInStatus, setSignInStatus] = useState('loading')
+
+  const responseGoogle = googleUser => {
+    var profile = googleUser.getBasicProfile()
+    var id_token = googleUser.getAuthResponse().id_token
+    console.log('ID token', id_token)
+    console.log('ID: ' + profile.getId()) // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName())
+    console.log('Image URL: ' + profile.getImageUrl())
+    console.log('Email: ' + profile.getEmail()) // This is null if the 'email' scope is not present.
+    setName(profile.getName())
+  }
+
+  async function signIn() {
+    var auth2 = window.gapi.auth2.getAuthInstance()
+    const googleUser = await auth2.signIn({
+      scope: 'profile email'
+    })
+    responseGoogle(googleUser)
+  }
+
+  function signOut() {
+    console.log('hey')
+    var auth2 = window.gapi.auth2.getAuthInstance()
+    auth2.signOut().then(function () {
+      console.log('User signed out.')
+    })
+  }
+
+  useEffect(() => {
+    window.init = () => {
+      console.log('initing!')
+      function handleGoogleInit(auth) {
+        console.log(auth)
+
+        const isSignedIn = auth.isSignedIn.get()
+        setSignInStatus(isSignedIn ? 'signedIn' : 'notSignedIn')
+      }
+
+      window.gapi.load('auth2', function () {
+        /* Ready. Make a call to gapi.auth2.init or some other API */
+
+        if (window.gapi && process.env.NEXT_PUBLIC_GOOGLE_ID) {
+          const auth = window.gapi.auth2.init({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_ID
+          })
+
+          auth.then(handleGoogleInit)
+
+          console.log({ auth })
+        }
+      })
+    }
+  }, [])
+
   return (
     <div className="container">
+      <button onClick={signIn}>Sign in</button>
+      <button onClick={signOut}>Sign out</button>
+      <div>{signInStatus}</div>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
+        <script
+          src="https://apis.google.com/js/platform.js?onload=init"
+          async
+          defer
+        ></script>
       </Head>
-
       <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
-        </h1>
-
-        <LoginWithGoogleButton />
-
+        <h1 className="title">Matchmaking {name}</h1>
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
         ) : (
           <h2 className="subtitle">
             You are NOT connected to MongoDB. Check the <code>README.md</code> for
-            instructions.
+            instructions..
           </h2>
         )}
 
@@ -32,33 +91,16 @@ export default function Home({ isConnected }) {
 
         <div className="grid">
           <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
+            <h3>Create a game</h3>
+            <p>Lorem ipsum dolor sit amet.</p>
           </a>
 
           <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
+            <h3>Find a game</h3>
+            <p>Lorem ipsum dolor sit amet.</p>
           </a>
         </div>
       </main>
-
       <footer>
         <a
           href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
@@ -68,7 +110,6 @@ export default function Home({ isConnected }) {
           Powered by <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
         </a>
       </footer>
-
       <style jsx>{`
         .container {
           min-height: 100vh;
@@ -203,7 +244,6 @@ export default function Home({ isConnected }) {
           }
         }
       `}</style>
-
       <style jsx global>{`
         html,
         body {
