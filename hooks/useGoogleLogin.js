@@ -13,6 +13,7 @@ function useGoogleLogin() {
 
   useEffect(() => {
     function initGoogle() {
+      console.log('initing google')
       function handleGoogleInit(auth) {
         const isSignedIn = auth.isSignedIn.get()
         setSignInStatus(isSignedIn ? 'signedIn' : 'notSignedIn')
@@ -35,7 +36,9 @@ function useGoogleLogin() {
     }
 
     const googleInterval = setInterval(() => {
+      console.log('in interval')
       if (window.gapi) {
+        console.log('found gapi!')
         initGoogle()
         clearInterval(googleInterval)
       }
