@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import useGoogleLogin, { googleSignInStatuses } from '../hooks/useGoogleLogin'
+import { postData } from '../util/apiHelpers'
 
 const CreateGame = () => {
-  const { signInStatus, signIn } = useGoogleLogin()
+  const { signInStatus, signIn, user } = useGoogleLogin()
+
+  const { id_token } = user
 
   const [map, setMap] = useState('skeld')
   const [playerCount, setPlayerCount] = useState(9)
   const [gameCode, setGameCode] = useState()
+  const [playerName, setPlayerName] = useState()
   const [creatingGame, setCreatingGame] = useState(false)
 
   if (signInStatus === googleSignInStatuses.loading) {
@@ -41,7 +45,7 @@ const CreateGame = () => {
     </div>
   )
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     console.log('will set the game with', {
       map,
@@ -49,6 +53,19 @@ const CreateGame = () => {
       gameCode
     })
     setCreatingGame(true)
+
+    const res = await postData('/api/createGame', {
+      id_token,
+      settings: { map, playerCount, gameCode, playerName }
+    })
+
+    console.log({ res })
+
+    if (res.gameId) {
+      setCreatingGame(false)
+    }
+
+    console.log(`will redirect to ${res.gameId}`)
   }
 
   if (creatingGame) {
@@ -92,6 +109,16 @@ const CreateGame = () => {
               onChange={e =>
                 setGameCode(e.target.value.replaceAll(/[^a-zA-Z]/g, '').toUpperCase())
               }
+            />
+          </div>
+          <div>
+            <p>What's your player name?</p>
+            <input
+              type="text"
+              maxLength="10"
+              value={playerName}
+              required
+              onChange={e => setPlayerName(e.target.value)}
             />
           </div>
           <button style={{ marginTop: 20 }}>Create game</button>
