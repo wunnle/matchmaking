@@ -8,7 +8,7 @@ const CreateGame = () => {
   const { id_token } = user
 
   const [map, setMap] = useState('skeld')
-  const [playerCount, setPlayerCount] = useState(9)
+  const [maxPlayers, setMaxPlayers] = useState(9)
   const [gameCode, setGameCode] = useState()
   const [playerName, setPlayerName] = useState()
   const [creatingGame, setCreatingGame] = useState(false)
@@ -38,8 +38,8 @@ const CreateGame = () => {
         id={value}
         name="playerCount"
         value={value}
-        checked={playerCount === value}
-        onChange={() => setPlayerCount(value)}
+        checked={maxPlayers === value}
+        onChange={() => setMaxPlayers(value)}
       />
       <label htmlFor={value}>{name}</label>
     </div>
@@ -49,14 +49,14 @@ const CreateGame = () => {
     e.preventDefault()
     console.log('will set the game with', {
       map,
-      playerCount,
+      playerCount: maxPlayers,
       gameCode
     })
     setCreatingGame(true)
 
     const res = await postData('/api/createGame', {
       id_token,
-      settings: { map, playerCount, gameCode, playerName }
+      settings: { map, maxPlayers, gameCode, playerName }
     })
 
     console.log({ res })
