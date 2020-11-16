@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import useGoogleLogin, { googleSignInStatuses } from '../hooks/useGoogleLogin'
 import { postData } from '../util/apiHelpers'
+import Router from 'next/router'
 
 const CreateGame = () => {
   const { signInStatus, signIn, user } = useGoogleLogin()
@@ -64,6 +65,8 @@ const CreateGame = () => {
     if (res.gameId) {
       setCreatingGame(false)
     }
+
+    Router.push(`/game/${res.gameId}`)
 
     console.log(`will redirect to ${res.gameId}`)
   }

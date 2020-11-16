@@ -1,3 +1,4 @@
+import Router from 'next/router'
 import { useState } from 'react'
 import useGoogleLogin, { googleSignInStatuses } from '../hooks/useGoogleLogin'
 import { postData } from '../util/apiHelpers'
@@ -17,7 +18,7 @@ const FindAndJoinGame = () => {
       id_token,
       settings: { map, playerName }
     })
-    console.log({ res })
+    Router.push(`/game/${res.gameId}`)
   }
 
   if (signInStatus === googleSignInStatuses.loading) {
